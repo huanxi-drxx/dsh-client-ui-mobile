@@ -1,7 +1,7 @@
 {
   "name": "@local/dsh-client-ui-mobile",
   "description": "Mobile responsive drawer layout for the DSH web UI (user-installed, auto-loads at boot)",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
