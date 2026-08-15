@@ -1,0 +1,86 @@
+# dsh-client-ui-mobile
+
+让 [DSH](https://github.com/deepseek-ai/deepseek-harness) 的 Web 界面在**手机浏览器**上以抽屉式侧栏布局适配显示。电脑端打开与原版**完全一致**，只有手机端（窄屏 / 触屏设备）才会发生变化。
+
+> 测试环境：DSH `0.1.0-rc.6`（web profile）。核心功能基于布局框架的稳定 data 属性，跨版本可用；部分细节样式依赖特定版本类名，详见[兼容性](#-兼容性说明)。
+
+---
+
+## ✨ 功能
+
+| 功能 | 说明 |
+|---|---|
+| 📱 抽屉式布局 | 手机端侧栏隐藏，对话区占满全屏；☰ 按钮滑出侧栏抽屉，点遮罩关闭 |
+| 🖥 桌面端不变 | ≥1024px 且非移动设备时，界面与原版完全一致 |
+| 📊 统计栏 | 底部对话统计折叠为"一行预览 + 展开箭头"，点击展开完整统计 |
+| ⏱ 消息元信息 | 每条消息下方的"时间 · 用时 · TTFT · tok/s"完整显示，紧凑竖线分隔 |
+| ⌨️ 回车设置 | 设置 → 通用 → **手机端回车键**：回车 = 发送消息，或回车 = 插入换行 |
+| ⚙️ 设置页适配 | 手机端设置面板全屏显示、导航横向排列，插件列表完整显示 |
+
+## 📦 安装
+
+要求：已安装 DSH（web profile），即 `~/.dsh/profiles/web/` 目录存在。
+
+### 自动安装（推荐）
+
+```bash
+git clone <你的仓库地址> dsh-client-ui-mobile
+cd dsh-client-ui-mobile
+./install.sh
+```
+
+安装脚本会：
+1. 把插件复制到 `~/.dsh/profiles/web/node_modules/@local/dsh-client-ui-mobile/`
+2. 在 `~/.dsh/profiles/web/cordis.patch.yml` 中添加 `ui-mobile` 组合行
+
+然后**重启 DSH**，并在浏览器中**强制刷新**（Ctrl/Cmd+Shift+R）即可生效。
+
+### 手动安装
+
+```bash
+# 1. 复制插件包
+mkdir -p ~/.dsh/profiles/web/node_modules/@local
+cp -r lib package.json ~/.dsh/profiles/web/node_modules/@local/dsh-client-ui-mobile/
+
+# 2. 在 ~/.dsh/profiles/web/cordis.patch.yml 末尾添加：
+# - insert:
+#     - id: ui-mobile
+#       name: '@local/dsh-client-ui-mobile'
+
+# 3. 重启 dsh，浏览器强制刷新
+```
+
+## 🗑 卸载
+
+```bash
+./uninstall.sh
+```
+
+或手动：删除 `~/.dsh/profiles/web/node_modules/@local/dsh-client-ui-mobile/`，并移除 `cordis.patch.yml` 中的 `ui-mobile` 行，然后重启 dsh。
+
+## 🎯 使用
+
+- 手机浏览器打开 DSH 网页 → 自动启用移动布局（无需配置）
+- ☰ 按钮（左上角/会话头部）→ 滑出侧栏抽屉；点击遮罩 → 关闭
+- 底部统计 → 点展开箭头看完整数据，再点收起
+- 设置 → 通用 → **手机端回车键** → 选择"发送消息"或"插入换行"（默认发送，偏好保存在浏览器本地）
+
+## 🔍 检测逻辑（什么设备会启用移动布局）
+
+满足**任意一条**即启用：
+- 视口宽度 ≤ 1023px
+- UA 包含 `Android` / `iPhone` / `iPod` / `Mobile`
+- 物理屏幕 ≤ 480px 的触屏设备
+- 触屏且视口 ≤ 1280px
+
+其他情况（桌面、宽屏触屏本）保持原版布局。
+
+## ⚠️ 兼容性说明
+
+- **核心抽屉布局**：基于 DSH 布局框架的稳定 data 属性（`data-sidebar-collapsed`、`data-details-collapsed`、`data-shell-overlay`），DSH 升级后通常仍可用。
+- **细节样式**：设置页全屏、统计栏、消息元信息分隔、头部按钮位置等依赖该版本生成的 CSS 类名（如 `wSkVaW_*`、`VOzbGW_*`、`p-xYUq_*`、`FJxK0a_*`、`qSYn7G_*`）。DSH 升级后若某处样式失效，更新 `lib/client.js` 中对应的类名即可（本仓库欢迎 PR）。
+- 这是社区插件，非 DSH 官方组件；使用前建议备份 `cordis.patch.yml`。
+
+## 📄 License
+
+[MIT](./LICENSE)
