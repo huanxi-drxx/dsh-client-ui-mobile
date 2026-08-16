@@ -21,9 +21,9 @@ cp "$SRC/package.json" "$DEST/"
 cp "$SRC/lib/index.js" "$SRC/lib/client.js" "$DEST/lib/"
 echo "plugin copied -> $DEST"
 
-# 2. add the composition row
-if [ -f "$PATCH" ] && grep -q 'ui-mobile' "$PATCH"; then
-  echo "cordis.patch.yml already contains 'ui-mobile'; nothing to add."
+# 2. add the composition rows (ui-mobile + multi-model web search provider)
+if [ -f "$PATCH" ] && grep -q 'dshm-search' "$PATCH" && grep -q 'ui-mobile' "$PATCH"; then
+  echo "cordis.patch.yml already contains the ui-mobile + web-search rows; nothing to add."
 else
   if [ -f "$PATCH" ]; then
     # drop a bare '[]' empty-array line (default profile composition) so block
@@ -32,12 +32,16 @@ else
   fi
   cat >> "$PATCH" <<'EOF'
 
-# Mobile responsive drawer layout (dsh-client-ui-mobile)
+# Mobile responsive drawer layout + multi-model web search (dsh-client-ui-mobile)
+- id: web
+  config:
+    searchProvider: dshm-search
+
 - insert:
     - id: ui-mobile
       name: '@local/dsh-client-ui-mobile'
 EOF
-  echo "composition row added -> $PATCH"
+  echo "composition rows added -> $PATCH"
 fi
 
 echo
