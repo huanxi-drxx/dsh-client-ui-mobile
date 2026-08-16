@@ -10,6 +10,14 @@ const code = fs.readFileSync("/data/data/com.termux/files/home/projects/dsh-clie
 const captured = [];
 const registrations = [];
 
+let fakeSessionsCurrent = "session-aaa";
+const fakeSessions = {
+  list: {
+    getSnapshot: () => ({ current: fakeSessionsCurrent, byId: {} }),
+    subscribe: (fn) => { fakeSessionsSub = fn; return () => { fakeSessionsSub = null; }; },
+  },
+};
+let fakeSessionsSub = null;
 const fakeSlotService = {
   inject(name, register) { registrations.push({ name }); register(fakeSlotService); return () => {}; },
   register(desc, Comp) { captured.push({ desc, Comp }); return { dispose: () => {} }; },
@@ -25,7 +33,7 @@ const ctx = {
       loc.getSnapshot = () => ({ lang: "zh" });
       return loc;
     }
-    if (name === "sessions") return { open: () => {}, fork: () => {} };
+    if (name === "sessions") return fakeSessions;
     return undefined;
   },
   effect(cb) { cb(); return () => {}; },
@@ -87,4 +95,4 @@ for (const c of captured.filter(c => c.Comp)) {
     process.exitCode = 1;
   }
 }
-console.log("SMOKE DONE");
+console.log("SMOKE DONE"); process.exit(0);
